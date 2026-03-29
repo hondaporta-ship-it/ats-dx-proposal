@@ -1,0 +1,778 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ATS DX推進提案書 — 全業務フロー自動化による経営改革</title>
+<style>
+  @page { size: A4; margin: 15mm 18mm 20mm 18mm; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --primary: #1a3a6b;
+    --primary-light: #2d5aa0;
+    --accent: #e8a617;
+    --accent-light: #ffd966;
+    --bg: #ffffff;
+    --bg-light: #f4f7fb;
+    --bg-blue: #e8eef8;
+    --text: #2c3e50;
+    --text-light: #5a6c7e;
+    --border: #d1dce8;
+    --success: #27ae60;
+    --danger: #e74c3c;
+    --warning: #f39c12;
+  }
+
+  body {
+    font-family: "Hiragino Kaku Gothic ProN", "Noto Sans JP", "Yu Gothic", sans-serif;
+    color: var(--text);
+    background: var(--bg);
+    line-height: 1.7;
+    font-size: 10.5pt;
+  }
+
+  /* Cover */
+  .cover {
+    page-break-after: always;
+    min-height: 700px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    background: linear-gradient(160deg, var(--primary) 0%, #0f2447 100%);
+    color: #fff;
+    padding: 60px 40px;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before { content:''; position:absolute; top:-100px; right:-100px; width:500px; height:500px; background:rgba(255,255,255,0.03); border-radius:50%; }
+  .cover::after { content:''; position:absolute; bottom:-80px; left:-80px; width:400px; height:400px; background:rgba(232,166,23,0.08); border-radius:50%; }
+  .cover-badge { background:var(--accent); color:var(--primary); font-weight:800; font-size:14pt; padding:8px 28px; border-radius:30px; margin-bottom:30px; letter-spacing:1px; z-index:1; }
+  .cover h1 { font-size:28pt; font-weight:800; letter-spacing:2px; margin-bottom:12px; z-index:1; }
+  .cover h2 { font-size:15pt; font-weight:400; opacity:0.9; margin-bottom:40px; z-index:1; border:none; padding:0; }
+  .cover-roi { background:rgba(255,255,255,0.12); border:2px solid rgba(255,255,255,0.3); border-radius:16px; padding:24px 48px; margin-bottom:40px; z-index:1; }
+  .cover-roi .big-number { font-size:52pt; font-weight:900; color:var(--accent); line-height:1.1; }
+  .cover-roi .roi-label { font-size:13pt; opacity:0.85; }
+  .cover-meta { font-size:10pt; opacity:0.7; z-index:1; }
+  .cover-meta p { margin:4px 0; }
+
+  /* Pages */
+  .page { page-break-after: always; padding: 40px 48px; max-width: 900px; margin: 0 auto; }
+  .page:last-child { page-break-after: avoid; }
+
+  .section-num { display:inline-block; background:var(--primary); color:#fff; font-size:10pt; font-weight:700; padding:3px 14px; border-radius:4px; margin-bottom:8px; }
+  h2.section-title { font-size:20pt; color:var(--primary); border-bottom:3px solid var(--accent); padding-bottom:8px; margin-bottom:24px; border-left:none; padding-left:0; }
+  h3 { font-size:13pt; color:var(--primary); margin:20px 0 10px; padding-left:12px; border-left:4px solid var(--accent); }
+  h4 { font-size:11pt; color:var(--primary-light); margin:14px 0 6px; }
+
+  /* Summary box */
+  .summary-box { background:var(--bg-blue); border-left:5px solid var(--primary); border-radius:0 10px 10px 0; padding:20px 24px; margin:16px 0; font-size:11pt; }
+  .summary-box strong { color:var(--primary); }
+
+  /* Highlight cards */
+  .highlight-grid { display:flex; flex-wrap:wrap; gap:16px; margin:20px 0; justify-content:center; }
+  .highlight-card { background:var(--bg-light); border-radius:12px; padding:20px; text-align:center; border:1px solid var(--border); flex:1; min-width:160px; max-width:220px; }
+  .highlight-card .num { font-size:28pt; font-weight:900; color:var(--primary); line-height:1.2; }
+  .highlight-card .unit { font-size:11pt; color:var(--text-light); }
+  .highlight-card .label { font-size:9pt; color:var(--text-light); margin-top:4px; }
+  .highlight-card.accent { background:linear-gradient(135deg, var(--primary) 0%, var(--primary-light) 100%); color:#fff; border:none; }
+  .highlight-card.accent .num { color:var(--accent); }
+  .highlight-card.accent .unit, .highlight-card.accent .label { color:rgba(255,255,255,0.85); }
+
+  /* Tables */
+  table { width:100%; border-collapse:collapse; margin:14px 0; font-size:9.5pt; }
+  thead th { background:var(--primary); color:#fff; padding:8px 10px; text-align:left; font-weight:600; font-size:9pt; }
+  tbody td { padding:7px 10px; border-bottom:1px solid var(--border); }
+  tbody tr:nth-child(even) { background:var(--bg-light); }
+  .text-right { text-align:right; }
+  .text-center { text-align:center; }
+  .bold { font-weight:700; }
+  .total-row td { background:var(--bg-blue) !important; font-weight:700; border-top:2px solid var(--primary); }
+
+  /* Flow */
+  .flow-diagram { display:flex; align-items:center; flex-wrap:wrap; gap:6px; margin:14px 0; padding:16px; background:var(--bg-light); border-radius:10px; }
+  .flow-step { background:var(--primary); color:#fff; padding:8px 14px; border-radius:8px; font-size:9pt; font-weight:600; text-align:center; min-width:80px; }
+  .flow-step.problem { background:var(--danger); }
+  .flow-step.solution { background:var(--success); }
+  .flow-arrow { font-size:16pt; color:var(--primary-light); font-weight:700; }
+
+  /* Phase */
+  .phase-block { border:2px solid var(--border); border-radius:12px; padding:20px; margin:16px 0; position:relative; }
+  .phase-block.phase1 { border-color:var(--danger); }
+  .phase-block.phase2 { border-color:var(--warning); }
+  .phase-block.phase3 { border-color:var(--success); }
+  .phase-label { position:absolute; top:-12px; left:20px; padding:2px 16px; border-radius:12px; font-size:9pt; font-weight:700; color:#fff; }
+  .phase1 .phase-label { background:var(--danger); }
+  .phase2 .phase-label { background:var(--warning); }
+  .phase3 .phase-label { background:var(--success); }
+
+  /* Bar chart */
+  .bar-chart { margin:16px 0; }
+  .bar-row { display:flex; align-items:center; margin:8px 0; }
+  .bar-label { width:80px; font-size:9pt; font-weight:600; text-align:right; padding-right:12px; }
+  .bar-track { flex:1; background:var(--bg-light); border-radius:6px; height:32px; overflow:hidden; }
+  .bar-fill { height:100%; border-radius:6px; display:flex; align-items:center; padding-left:10px; color:#fff; font-size:9pt; font-weight:700; }
+  .bar-fill.return { background:var(--success); }
+  .bar-value { margin-left:10px; font-size:9pt; font-weight:700; white-space:nowrap; }
+
+  /* Before/After */
+  .ba-grid { display:flex; flex-wrap:wrap; gap:16px; margin:16px 0; align-items:start; }
+  .ba-card { border-radius:12px; padding:18px; flex:1; min-width:250px; }
+  .ba-before { background:#fef2f2; border:2px solid #fca5a5; }
+  .ba-after { background:#f0fdf4; border:2px solid #86efac; }
+  .ba-arrow { display:flex; align-items:center; font-size:24pt; color:var(--primary-light); padding-top:40px; }
+  .ba-title { font-weight:800; font-size:11pt; margin-bottom:8px; }
+  .ba-before .ba-title { color:var(--danger); }
+  .ba-after .ba-title { color:var(--success); }
+  .ba-card ul { list-style:none; padding:0; font-size:9.5pt; }
+  .ba-card li { padding:3px 0 3px 18px; position:relative; }
+  .ba-before li::before { content:'✕'; position:absolute; left:0; color:var(--danger); font-weight:700; }
+  .ba-after li::before { content:'✓'; position:absolute; left:0; color:var(--success); font-weight:700; }
+
+  /* Gantt */
+  .gantt { margin:16px 0; }
+  .gantt-row { display:flex; align-items:center; margin:6px 0; }
+  .gantt-label { width:140px; font-size:9pt; font-weight:600; padding-right:8px; text-align:right; }
+  .gantt-track { flex:1; display:flex; gap:2px; height:26px; }
+  .gantt-cell { flex:1; border-radius:4px; background:var(--bg-light); }
+  .gantt-cell.active-red { background:var(--danger); }
+  .gantt-cell.active-orange { background:var(--warning); }
+  .gantt-cell.active-green { background:var(--success); }
+
+  /* Message box */
+  .msg-box { background:linear-gradient(135deg, #fef9e7 0%, #fdf2e9 100%); border:2px solid var(--accent); border-radius:12px; padding:18px 24px; margin:16px 0; font-size:11pt; }
+  .msg-box .emoji { font-size:18pt; margin-right:8px; }
+  .msg-box .msg-main { font-weight:800; color:var(--primary); font-size:14pt; }
+
+  /* Callout */
+  .callout { display:flex; gap:12px; background:var(--bg-blue); border-radius:10px; padding:14px 18px; margin:12px 0; align-items:flex-start; }
+  .callout-icon { font-size:20pt; line-height:1; }
+  .callout-text { font-size:9.5pt; }
+
+  .risk-high { color:var(--danger); font-weight:700; }
+  .risk-mid { color:var(--warning); font-weight:700; }
+  .risk-low { color:var(--success); font-weight:700; }
+
+  .glossary-table td { font-size:9pt; }
+  .glossary-table td:first-child { font-weight:700; white-space:nowrap; width:80px; }
+  .glossary-table td:nth-child(2) { font-size:8.5pt; color:var(--text-light); width:220px; }
+
+  .page-footer { text-align:center; font-size:8pt; color:var(--text-light); margin-top:30px; padding-top:10px; border-top:1px solid var(--border); }
+
+  p { margin:8px 0; }
+  strong { color:var(--primary); }
+
+  @media print {
+    body { font-size:9.5pt; }
+    .cover { min-height:auto; padding:100px 40px; }
+    .page { padding:20px 0; }
+    .highlight-card .num { font-size:22pt; }
+    .cover-roi .big-number { font-size:40pt; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ===== COVER ===== -->
+<div class="cover">
+  <div class="cover-badge">経営提案書</div>
+  <h1>ATS 全業務フロー<br>DX推進提案</h1>
+  <h2>AI導入による業務革新と持続的成長の実現</h2>
+  <div class="cover-roi">
+    <div class="roi-label">3年間 投資対効果（ROI）</div>
+    <div class="big-number">920%</div>
+    <div class="roi-label">投資 36万円 → 効果 367万円</div>
+  </div>
+  <div class="cover-meta">
+    <p>エーティーセキュリティー株式会社　三津谷 智大 社長 御中</p>
+    <p>2026年3月 | 提案者: 本田 英樹</p>
+    <p style="margin-top:8px; font-size:9pt; opacity:0.5;">Confidential — 社外秘</p>
+  </div>
+</div>
+
+<!-- ===== 1. EXECUTIVE SUMMARY ===== -->
+<div class="page">
+  <div class="section-num">SECTION 01</div>
+  <h2 class="section-title">エグゼクティブサマリー</h2>
+
+  <div class="summary-box">
+    <strong>3行で言うと：</strong><br>
+    ① ATSの事務作業（月119時間）を<strong>AI・自動化で月47時間に圧縮</strong>（72時間＝約61%削減）<br>
+    ② 必要な投資は<strong>月額わずか1万円以下</strong>（API<small>※</small>・クラウド<small>※</small>利用料）、初期費用12万円<br>
+    ③ 年間約130万円のコスト削減、<strong>3年間で367万円の効果</strong>（ROI<small>※</small> 920%）
+  </div>
+
+  <div class="highlight-grid">
+    <div class="highlight-card">
+      <div class="num">72<span class="unit">h/月</span></div>
+      <div class="label">削減される事務時間</div>
+    </div>
+    <div class="highlight-card">
+      <div class="num">130<span class="unit">万円/年</span></div>
+      <div class="label">年間コスト削減額</div>
+    </div>
+    <div class="highlight-card accent">
+      <div class="num">920<span class="unit">%</span></div>
+      <div class="label">3年間ROI<small>※</small></div>
+    </div>
+  </div>
+
+  <div class="msg-box">
+    <span class="emoji">💡</span>
+    <span class="msg-main">月1万円以下の投資で、月10万円以上の効果。即月回収。</span>
+  </div>
+
+  <h3>提案のポイント</h3>
+  <table>
+    <thead><tr><th>項目</th><th>内容</th></tr></thead>
+    <tbody>
+      <tr><td class="bold">何をやるか</td><td>LINE WORKS報告書の自動読み取り、給与計算・請求書自動化、シフト管理最適化</td></tr>
+      <tr><td class="bold">誰が作るか</td><td>本田がAIツールを使って社内で開発（外注不要）</td></tr>
+      <tr><td class="bold">現場の変化</td><td>隊員の行動は一切変更なし。バックオフィスだけが自動化される</td></tr>
+      <tr><td class="bold">リスク</td><td>Phase<small>※</small> 1は月1万円以下でPoC<small>※</small>。効果がなければ即停止可能</td></tr>
+      <tr><td class="bold">最初の成果</td><td>1ヶ月目から月31時間の削減を見込む</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-footer">ATS DX推進提案書 | 2026年3月 — 1</div>
+</div>
+
+<!-- ===== 2. CURRENT STATE ===== -->
+<div class="page">
+  <div class="section-num">SECTION 02</div>
+  <h2 class="section-title">ATSの現状と課題</h2>
+
+  <h3>現在の業務フロー全体像</h3>
+  <table>
+    <thead><tr><th>業務領域</th><th>担当者</th><th>月間工数</th><th>現状ツール</th><th>課題レベル</th></tr></thead>
+    <tbody>
+      <tr><td class="bold">報告書入力（上番・下番転記）</td><td>森さん</td><td class="text-right">18h</td><td>LINE WORKS→Excel手入力</td><td class="text-center risk-high">★★★</td></tr>
+      <tr><td class="bold">給与計算・請求書・仮払い</td><td>森さん</td><td class="text-right">25h</td><td>Excel手作業</td><td class="text-center risk-high">★★★</td></tr>
+      <tr><td class="bold">その他事務雑務</td><td>森さん</td><td class="text-right">15h</td><td>—</td><td class="text-center risk-low">★☆☆</td></tr>
+      <tr><td class="bold">シフト管理</td><td>樫迫さん</td><td class="text-right">32h</td><td>Excel + 電話 + メール</td><td class="text-center risk-high">★★★</td></tr>
+      <tr><td class="bold">研修管理</td><td>事務</td><td class="text-right">10h</td><td>紙 / Excel</td><td class="text-center risk-mid">★★☆</td></tr>
+      <tr><td class="bold">法定書類管理</td><td>事務</td><td class="text-right">8h</td><td>紙 / Excel</td><td class="text-center risk-mid">★★☆</td></tr>
+      <tr><td class="bold">顧客管理</td><td>事務</td><td class="text-right">6h</td><td>Excel / 紙</td><td class="text-center risk-low">★☆☆</td></tr>
+      <tr><td class="bold">見積り作成</td><td>事務</td><td class="text-right">5h</td><td>Excelテンプレート</td><td class="text-center risk-low">★☆☆</td></tr>
+      <tr class="total-row"><td class="bold">合計</td><td></td><td class="text-right bold">119h</td><td></td><td class="text-center bold">月額約17.9万円</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:8pt; color:var(--text-light);">※ その他事務雑務（切手・レターパック購入、コピー等）は物理作業のため自動化対象外</p>
+
+  <h3>ボトルネック①: 報告書転記 → 給与計算の連鎖</h3>
+  <div class="flow-diagram">
+    <div class="flow-step">🏗️ 現場隊員<br>上番・下番を記入</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">📸 スマホ撮影</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">📱 LINE WORKS<br>で画像送信</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step problem">⚠️ 森さんが<br>Excelに手入力</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step problem">⚠️ 15分単位で<br>残業計算<br><small>給与・仮払い処理</small></div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">⏰</div>
+    <div class="callout-text">
+      <strong>入力自体は1日約15分ですが、そこから連鎖する給与計算が大きな負担。</strong><br>
+      15分単位の残業計算、週払い希望者への仮払い処理、請求書作成まで含めると月25時間。
+      特に毎月18〜20日頃は給料日（25日）に向けた集中作業で残業になることも。
+    </div>
+  </div>
+
+  <h3>ボトルネック②: シフト管理の「人力マッチング」</h3>
+  <div class="flow-diagram">
+    <div class="flow-step">📋 隊員から<br>NG日を収集</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">📊 樫迫さんが<br>案件×隊員で<br>シフト案を作成</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step problem">📞 遠方・難易度高の<br>現場は個別に<br>電話・LINEで確認</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step problem">⏳ ダメなら<br>別の候補で<br>組み直し</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step">📅 金曜日に<br>翌週を公開</div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">📞</div>
+    <div class="callout-text">
+      <strong>特に事前確認が必要なのは以下のケース：</strong><br>
+      ・駅から徒歩30分以上、または車で1時間以上かかる遠方の現場<br>
+      ・遠い現場に1週間連続で入る配置<br>
+      ・現場監督が厳しい、対応が難しい現場<br>
+      こうした条件付き案件のたびに電話・LINEで個別確認 → ダメなら別の候補を探して組み直し。
+      断った隊員は楽な現場に回り、素直に受ける隊員ばかりが大変な現場に行く<strong>「ゴネ得」構造</strong>が生まれ、隊員の不満が蓄積。
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🌧️</div>
+    <div class="callout-text">
+      <strong>さらに業界特有の「前日キャンセル」問題。</strong><br>
+      警備業界では前日13〜14時までのキャンセルは費用ゼロ。このため「明日雨だからやめます」という連絡が前日〜2日前に頻発し、
+      そのたびにアサインを組み直す必要が生じます。<br>
+      早めにシフトを出すと、キャンセルで変更 →「近い現場だったのに遠くなった」と隊員から不満が出る。
+      <strong>結果、樫迫さんは金曜まで待って翌週を出す「守りのアサイン」にならざるを得ない状況です。</strong><br><br>
+      さらに雨天・雪でキャンセルが出ると、空いた隊員の稼働を埋めるため、黒田営業部長が急きょ取引先や知り合いの会社に電話して
+      「隊員が空いているのでどこか現場はないか」と案件を探し回る作業が発生。
+      <strong>金曜に限らず、悪天候のたびにこの「緊急営業」が常態化しています。</strong>
+    </div>
+  </div>
+
+  <h3>「このまま」のリスク</h3>
+  <table>
+    <thead><tr><th>リスク</th><th>影響</th><th>深刻度</th></tr></thead>
+    <tbody>
+      <tr><td class="bold">属人化</td><td>森さん・樫迫さん不在時に業務が完全停止</td><td class="text-center risk-high">高</td></tr>
+      <tr><td class="bold">人的ミス</td><td>転記ミス、残業計算の誤り、シフトの組み間違い</td><td class="text-center risk-mid">中</td></tr>
+      <tr><td class="bold">スケール不可</td><td>案件増加に事務処理能力が追いつかない</td><td class="text-center risk-high">高</td></tr>
+      <tr><td class="bold">隊員の不満</td><td>シフトが2日前にしかわからない。断った人が楽な現場に回る「ゴネ得」構造で不公平感</td><td class="text-center risk-high">高</td></tr>
+      <tr><td class="bold">悪天候の売上ロス</td><td>雨天・雪でキャンセル → 空き隊員の穴埋めに営業が急きょ走り回る</td><td class="text-center risk-high">高</td></tr>
+      <tr><td class="bold">人材確保難</td><td>直前シフト＋単純作業で人材が定着しにくい</td><td class="text-center risk-mid">中</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-footer">ATS DX推進提案書 | 2026年3月 — 2</div>
+</div>
+
+<!-- ===== 3. ROADMAP ===== -->
+<div class="page">
+  <div class="section-num">SECTION 03</div>
+  <h2 class="section-title">提案: AI/DX<small>※</small>導入ロードマップ</h2>
+
+  <p style="font-size:10pt; margin-bottom:16px;">3つのフェーズ<small>※</small>で段階的に導入。Phase 1だけでも<strong>月31時間の削減</strong>を実現します。</p>
+
+  <!-- Phase 1 -->
+  <div class="phase-block phase1">
+    <div class="phase-label">Phase 1 — 今すぐ（1〜3ヶ月）🔥</div>
+    <h4 style="margin-top:8px;">報告書自動読取 + 給与計算・請求書自動化 + 森さんAI活用</h4>
+
+    <div class="highlight-grid" style="margin:12px 0;">
+      <div class="highlight-card" style="padding:12px;">
+        <div class="num" style="font-size:20pt;">31<span class="unit">h</span></div>
+        <div class="label">月間削減時間</div>
+      </div>
+      <div class="highlight-card" style="padding:12px;">
+        <div class="num" style="font-size:20pt;">¥4.7<span class="unit">万</span></div>
+        <div class="label">月間削減額</div>
+      </div>
+      <div class="highlight-card" style="padding:12px;">
+        <div class="num" style="font-size:20pt;">¥3<span class="unit">万</span></div>
+        <div class="label">初期投資</div>
+      </div>
+      <div class="highlight-card" style="padding:12px;">
+        <div class="num" style="font-size:20pt; color:var(--success);">即月</div>
+        <div class="label">投資回収</div>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>アクション</th><th>内容</th><th>期間</th><th>効果</th></tr></thead>
+      <tbody>
+        <tr><td class="bold">報告書AI-OCR<small>※</small></td><td>LINE WORKS画像→AI<small>※</small>が上番・下番の時間を自動読取→Excel自動入力</td><td>2〜4週</td><td>月16h削減</td></tr>
+        <tr><td class="bold">給与計算・請求書自動化</td><td>勤怠データから残業（15分単位）を自動計算。請求書・仮払い処理も自動生成</td><td>2〜4週</td><td>月15h削減</td></tr>
+        <tr><td class="bold">森さんAI活用</td><td>契約書・メール下書きなどの日常業務にAI活用</td><td>即日〜</td><td>品質向上</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="callout-icon">💰</div>
+      <div class="callout-text">
+        <strong>給与計算の自動化は森さんの最大の負担解消に直結。</strong>
+        上番・下番のデータが自動入力されれば、残業計算→給与→請求書まで一気通貫で自動化。
+        毎月18〜20日の「給料日前残業」がなくなります。
+      </div>
+    </div>
+
+    <div class="callout">
+      <div class="callout-icon">🎯</div>
+      <div class="callout-text"><strong>現場隊員の行動は一切変えません。</strong>今まで通りLINE WORKSで画像を送るだけ。裏側のシステムだけが変わります。</div>
+    </div>
+  </div>
+
+  <!-- Phase 2 -->
+  <div class="phase-block phase2">
+    <div class="phase-label">Phase 2 — 中期（3〜6ヶ月）</div>
+    <h4 style="margin-top:8px;">シフト最適化 + 研修管理 + 法定書類デジタル化</h4>
+
+    <div class="highlight-grid" style="margin:12px 0;">
+      <div class="highlight-card" style="padding:12px;">
+        <div class="num" style="font-size:20pt;">+34<span class="unit">h</span></div>
+        <div class="label">追加削減時間</div>
+      </div>
+      <div class="highlight-card" style="padding:12px;">
+        <div class="num" style="font-size:20pt;">¥5.1<span class="unit">万</span></div>
+        <div class="label">追加削減額/月</div>
+      </div>
+      <div class="highlight-card" style="padding:12px;">
+        <div class="num" style="font-size:20pt;">¥3<span class="unit">万</span></div>
+        <div class="label">追加投資</div>
+      </div>
+      <div class="highlight-card" style="padding:12px;">
+        <div class="num" style="font-size:20pt;">65<span class="unit">h</span></div>
+        <div class="label">累計削減/月</div>
+      </div>
+    </div>
+
+    <table>
+      <thead><tr><th>アクション</th><th>内容</th><th>効果</th></tr></thead>
+      <tbody>
+        <tr><td class="bold">隊員DB<small>※</small>構築</td><td>スキル・資格・NG日・勤務希望をデータベース化</td><td>基盤整備</td></tr>
+        <tr><td class="bold">シフト自動生成AI</td><td>NG日・スキル・資格・自宅エリアを元にAIが最適シフト案を自動提案。遠方現場・難易度も考慮</td><td>月24h削減</td></tr>
+        <tr><td class="bold">確認Bot<small>※</small></td><td>遠方・難易度高の現場など事前確認が必要な隊員へ一斉通知・回収を自動化</td><td>※シフト削減に含む</td></tr>
+        <tr><td class="bold">研修管理システム</td><td>研修時間の自動カウント・不足アラート</td><td>月5h削減</td></tr>
+        <tr><td class="bold">法定書類管理</td><td>期限管理ダッシュボード</td><td>月5h削減</td></tr>
+      </tbody>
+    </table>
+
+    <div class="callout">
+      <div class="callout-icon">📅</div>
+      <div class="callout-text">
+        <strong>シフトの「2日前通知」問題も解消へ。</strong>キャンセル発生時にAIが即座に再アサイン案を出せるため、
+        「組み直しが大変だから金曜まで待つ」必要がなくなり、隊員に早めにシフトを出せるように。
+        配置の公平性もAIが管理し、「ゴネ得」も防止。<strong>隊員の満足度向上 → 定着率アップ</strong>につながります。
+      </div>
+    </div>
+  </div>
+
+  <!-- Phase 3 -->
+  <div class="phase-block phase3">
+    <div class="phase-label">Phase 3 — 発展（6〜12ヶ月）</div>
+    <h4 style="margin-top:8px;">予測分析 + 顧客管理 + 経営ダッシュボード</h4>
+    <table>
+      <thead><tr><th>アクション</th><th>内容</th><th>効果</th></tr></thead>
+      <tbody>
+        <tr><td class="bold">需要予測</td><td>過去データからイベント需要を予測、人員計画に反映</td><td>戦略的価値</td></tr>
+        <tr><td class="bold">顧客管理CRM<small>※</small></td><td>契約更新の自動リマインド・対応履歴の一元管理</td><td>月4h削減</td></tr>
+        <tr><td class="bold">経営ダッシュボード</td><td>売上・稼働率・研修充足率をリアルタイム可視化</td><td>意思決定支援</td></tr>
+        <tr><td class="bold">見積り自動生成</td><td>過去実績ベースで最適見積を自動算出</td><td>月3h削減</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="page-footer">ATS DX推進提案書 | 2026年3月 — 3</div>
+</div>
+
+<!-- ===== 4. ROI ===== -->
+<div class="page">
+  <div class="section-num">SECTION 04</div>
+  <h2 class="section-title">投資対効果（ROI<small>※</small>）</h2>
+
+  <h3>Phase別コスト vs 効果</h3>
+  <table>
+    <thead><tr><th>項目</th><th class="text-right">Phase 1<br>(1-3ヶ月)</th><th class="text-right">Phase 2<br>(4-6ヶ月)</th><th class="text-right">Phase 3<br>(7-12ヶ月)</th><th class="text-right">合計</th></tr></thead>
+    <tbody>
+      <tr><td class="bold" colspan="5" style="background:var(--bg-blue);">📤 投資（コスト）</td></tr>
+      <tr><td>　初期投資（API・クラウド）</td><td class="text-right">¥30,000</td><td class="text-right">¥30,000</td><td class="text-right">¥60,000</td><td class="text-right bold">¥120,000</td></tr>
+      <tr><td>　本田 開発工数</td><td class="text-right">¥0 ※</td><td class="text-right">¥0 ※</td><td class="text-right">¥0 ※</td><td class="text-right">¥0</td></tr>
+      <tr><td class="bold" colspan="5" style="background:var(--bg-blue);">📥 効果（削減額）</td></tr>
+      <tr><td>　月間削減時間</td><td class="text-right">31h</td><td class="text-right">+34h</td><td class="text-right">+7h</td><td class="text-right bold">72h/月</td></tr>
+      <tr><td>　月間削減額</td><td class="text-right">¥46,500</td><td class="text-right">¥51,000</td><td class="text-right">¥10,500</td><td class="text-right bold">¥108,000/月</td></tr>
+      <tr class="total-row"><td class="bold">年間削減額</td><td class="text-right">¥558,000</td><td class="text-right">¥612,000</td><td class="text-right">¥126,000</td><td class="text-right bold">¥1,296,000</td></tr>
+    </tbody>
+  </table>
+  <p style="font-size:8pt; color:var(--text-light);">※ 本田の開発工数は社内リソースのため追加コスト0として計算。その他事務雑務（月15h）は物理作業のため削減対象外</p>
+
+  <h3>3年間の累計効果</h3>
+  <div class="bar-chart">
+    <div class="bar-row">
+      <div class="bar-label">1年目</div>
+      <div class="bar-track"><div class="bar-fill return" style="width:29%;"><span>¥96万</span></div></div>
+      <div class="bar-value" style="color:var(--danger);">投資 ¥12万</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">2年目</div>
+      <div class="bar-track"><div class="bar-fill return" style="width:64%;"><span>¥214万（累計）</span></div></div>
+      <div class="bar-value" style="color:var(--danger);">投資 ¥24万</div>
+    </div>
+    <div class="bar-row">
+      <div class="bar-label">3年目</div>
+      <div class="bar-track"><div class="bar-fill return" style="width:100%;"><span>¥331万（累計）</span></div></div>
+      <div class="bar-value" style="color:var(--danger);">投資 ¥36万</div>
+    </div>
+  </div>
+
+  <div class="highlight-grid">
+    <div class="highlight-card">
+      <div class="num" style="font-size:22pt;">¥12<span class="unit">万円</span></div>
+      <div class="label">3年間の累計投資額</div>
+    </div>
+    <div class="highlight-card">
+      <div class="num" style="font-size:22pt;">¥367<span class="unit">万円</span></div>
+      <div class="label">3年間の累計削減額</div>
+    </div>
+    <div class="highlight-card accent">
+      <div class="num" style="font-size:22pt;">920<span class="unit">%</span></div>
+      <div class="label">ROI（投資利益率）</div>
+    </div>
+  </div>
+
+  <h3>コスト内訳（月額ランニング）</h3>
+  <table>
+    <thead><tr><th>項目</th><th>内容</th><th class="text-right">月額</th></tr></thead>
+    <tbody>
+      <tr><td>AI-OCR API<small>※</small></td><td>画像文字読み取りサービス</td><td class="text-right">¥0〜500</td></tr>
+      <tr><td>AI API</td><td>補助OCR・文脈理解用（従量課金）</td><td class="text-right">¥1,000〜3,000</td></tr>
+      <tr><td>クラウド<small>※</small>サーバー</td><td>システム実行環境（従量課金）</td><td class="text-right">¥1,000〜3,000</td></tr>
+      <tr><td>LINE WORKS</td><td>既存プラン内（Bot<small>※</small> API利用は追加費用なし）</td><td class="text-right">¥0</td></tr>
+      <tr><td>森さんAIツール利用料</td><td>月額約$20（会社負担）</td><td class="text-right">¥3,000</td></tr>
+      <tr class="total-row"><td class="bold" colspan="2">合計（月額ランニングコスト）</td><td class="text-right bold">¥5,000〜9,500</td></tr>
+    </tbody>
+  </table>
+
+  <div class="msg-box">
+    <span class="emoji">🎯</span>
+    <span class="msg-main">月1万円以下で月10.8万円の効果。投資回収は初月から。</span>
+  </div>
+
+  <div class="page-footer">ATS DX推進提案書 | 2026年3月 — 4</div>
+</div>
+
+<!-- ===== 5. STAFF IMPACT ===== -->
+<div class="page">
+  <div class="section-num">SECTION 05</div>
+  <h2 class="section-title">スタッフへの影響 — 「仕事が変わる」という安心</h2>
+
+  <div class="summary-box">
+    <strong>大切なメッセージ：</strong>AIは仕事を奪うものではありません。<br>
+    単純作業から解放され、<strong>もっと価値の高い仕事に集中できる</strong>ようになります。
+  </div>
+
+  <h3>森さんの業務 Before / After</h3>
+  <div class="ba-grid">
+    <div class="ba-card ba-before">
+      <div class="ba-title">Before（現在）</div>
+      <ul>
+        <li>LINE WORKS画像を1枚ずつ開く</li>
+        <li>上番・下番の時間を読み取りExcelに手入力</li>
+        <li>15分単位の残業を手計算</li>
+        <li>給与明細・請求書もExcelで手作業</li>
+        <li>週払い希望者への仮払い処理</li>
+        <li>毎月18〜20日頃は残業になるほど集中</li>
+      </ul>
+    </div>
+    <div class="ba-arrow">→</div>
+    <div class="ba-card ba-after">
+      <div class="ba-title">After（自動化後）</div>
+      <ul>
+        <li>AIが画像から上番・下番を自動読取</li>
+        <li>Excelに自動入力。森さんは確認のみ</li>
+        <li>残業計算・給与計算は自動</li>
+        <li>請求書・仮払いもワンクリック生成</li>
+        <li>月末の集中作業が大幅に軽減</li>
+        <li>空いた時間で他の業務に集中</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">🤝</div>
+    <div class="callout-text">
+      <strong>森さんはすでにChatGPTを活用中。</strong>AIツールの導入にも前向きで、AIトレーニングも3月から開始済み。
+      会社がAI活用を後押しすることで、<strong>やる気と能力の両面で成長が見込めます</strong>。
+    </div>
+  </div>
+
+  <h3>樫迫さんの業務 Before / After</h3>
+  <div class="ba-grid">
+    <div class="ba-card ba-before">
+      <div class="ba-title">Before（現在）</div>
+      <ul>
+        <li>隊員からNG日を収集し、案件×隊員でシフト案作成</li>
+        <li>遠方現場（駅から30分超・車1時間超）は個別に電話・LINE確認</li>
+        <li>1週間連続配置や難しい現場も事前確認が必要</li>
+        <li>断られたら別の候補を探して組み直し</li>
+        <li>断った人が楽な現場に回る「ゴネ得」→ 不公平感</li>
+        <li>前日キャンセル（雨天等）のたびに組み直し</li>
+        <li>空き隊員の穴埋めに営業が急きょ案件探し</li>
+        <li>早く出すと変更で不満が出るため金曜まで待つ</li>
+        <li>結果、隊員は2日前に配置を知る状況</li>
+        <li>週8時間以上がシフト管理に消える</li>
+        <li>人手不足で自身も現場に出ることも</li>
+      </ul>
+    </div>
+    <div class="ba-arrow">→</div>
+    <div class="ba-card ba-after">
+      <div class="ba-title">After（自動化後）</div>
+      <ul>
+        <li>隊員のNG日・スキル・資格をDB<small>※</small>で一元管理</li>
+        <li>隊員のNG日・スキル・資格・自宅エリアをDB<small>※</small>で一元管理</li>
+        <li>AIが通勤距離・現場難易度も考慮して最適シフト案を提案</li>
+        <li>配置の偏りをAIが検知 →「ゴネ得」を防ぎ公平に</li>
+        <li>遠方・難易度高の確認もBot<small>※</small>で一斉通知・回収</li>
+        <li>樫迫さんは最終確認と微調整のみ</li>
+        <li>キャンセル発生時もAIが即座に再アサイン案を提示</li>
+        <li>空き隊員の状況を即時把握 → 営業の案件探しも迅速に</li>
+        <li>組み直しが楽になるため、早めにシフトを出せる</li>
+        <li>週2時間で完了</li>
+        <li>空いた時間で現場品質管理・隊員育成に集中</li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="callout">
+    <div class="callout-icon">📞</div>
+    <div class="callout-text">
+      <strong>樫迫さんの最大の負担は「電話での1人ずつ確認」。</strong>
+      AIとBotの導入で、この「人力マッチング」を自動化。隊員側も早めにシフトがわかるようになり、
+      <strong>隊員の満足度向上 → 定着率アップ</strong>にもつながります。
+    </div>
+  </div>
+
+  <h3>現場隊員への影響</h3>
+  <div class="msg-box">
+    <span class="emoji">📱</span>
+    <span class="msg-main">現場隊員の行動は何も変わりません。</span><br>
+    <span style="font-size:10pt;">今まで通りLINE WORKSで報告書画像を送るだけ。さらにシフトが早めにわかるようになり、予定が立てやすくなります。</span>
+  </div>
+
+  <div class="page-footer">ATS DX推進提案書 | 2026年3月 — 5</div>
+</div>
+
+<!-- ===== 6. SCHEDULE ===== -->
+<div class="page">
+  <div class="section-num">SECTION 06</div>
+  <h2 class="section-title">スケジュール</h2>
+
+  <h3>12ヶ月ロードマップ</h3>
+  <div class="gantt">
+    <div style="display:flex; padding-left:148px; margin-bottom:4px;">
+      <span style="flex:1; text-align:center; font-size:7pt; color:var(--text-light);">4月</span>
+      <span style="flex:1; text-align:center; font-size:7pt; color:var(--text-light);">5月</span>
+      <span style="flex:1; text-align:center; font-size:7pt; color:var(--text-light);">6月</span>
+      <span style="flex:1; text-align:center; font-size:7pt; color:var(--text-light);">7月</span>
+      <span style="flex:1; text-align:center; font-size:7pt; color:var(--text-light);">8月</span>
+      <span style="flex:1; text-align:center; font-size:7pt; color:var(--text-light);">9月</span>
+      <span style="flex:1; text-align:center; font-size:7pt; color:var(--text-light);">10月</span>
+      <span style="flex:1; text-align:center; font-size:7pt; color:var(--text-light);">11月</span>
+      <span style="flex:1; text-align:center; font-size:7pt; color:var(--text-light);">12月</span>
+      <span style="flex:1; text-align:center; font-size:7pt; color:var(--text-light);">1月</span>
+      <span style="flex:1; text-align:center; font-size:7pt; color:var(--text-light);">2月</span>
+      <span style="flex:1; text-align:center; font-size:7pt; color:var(--text-light);">3月</span>
+    </div>
+    <div class="gantt-row"><div class="gantt-label">報告書OCR自動化</div><div class="gantt-track"><div class="gantt-cell active-red"></div><div class="gantt-cell active-red"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div></div></div>
+    <div class="gantt-row"><div class="gantt-label">給与計算・請求書</div><div class="gantt-track"><div class="gantt-cell active-red"></div><div class="gantt-cell active-red"></div><div class="gantt-cell active-red"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div></div></div>
+    <div class="gantt-row"><div class="gantt-label">森さんAI活用</div><div class="gantt-track"><div class="gantt-cell active-red"></div><div class="gantt-cell active-red"></div><div class="gantt-cell active-red"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div></div></div>
+    <div class="gantt-row"><div class="gantt-label">隊員DB構築</div><div class="gantt-track"><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell active-orange"></div><div class="gantt-cell active-orange"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div></div></div>
+    <div class="gantt-row"><div class="gantt-label">シフト自動生成AI</div><div class="gantt-track"><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell active-orange"></div><div class="gantt-cell active-orange"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div></div></div>
+    <div class="gantt-row"><div class="gantt-label">研修・法定書類</div><div class="gantt-track"><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell active-orange"></div><div class="gantt-cell active-orange"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div></div></div>
+    <div class="gantt-row"><div class="gantt-label">需要予測・CRM</div><div class="gantt-track"><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell active-green"></div><div class="gantt-cell active-green"></div><div class="gantt-cell active-green"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div></div></div>
+    <div class="gantt-row"><div class="gantt-label">経営ダッシュボード</div><div class="gantt-track"><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell"></div><div class="gantt-cell active-green"></div><div class="gantt-cell active-green"></div><div class="gantt-cell active-green"></div></div></div>
+  </div>
+  <div style="display:flex; gap:16px; font-size:8.5pt; margin:8px 0 20px 148px;">
+    <span style="padding:2px 10px; background:var(--danger); color:#fff; border-radius:4px;">■ Phase 1（即効性）</span>
+    <span style="padding:2px 10px; background:var(--warning); color:#fff; border-radius:4px;">■ Phase 2（最適化）</span>
+    <span style="padding:2px 10px; background:var(--success); color:#fff; border-radius:4px;">■ Phase 3（発展）</span>
+  </div>
+
+  <h3>来週からの具体的アクションプラン</h3>
+  <table>
+    <thead><tr><th>時期</th><th>アクション</th><th>担当</th><th>備考</th></tr></thead>
+    <tbody>
+      <tr><td class="bold">来週</td><td>社長承認 → プロジェクトキックオフ</td><td>三津谷社長・本田</td><td>本提案の承認</td></tr>
+      <tr><td class="bold">第1週</td><td>報告書サンプル収集・森さんヒアリング</td><td>本田・森さん</td><td>Excel入力項目の確認</td></tr>
+      <tr><td class="bold">第1〜2週</td><td>LINE WORKS Bot開発・OCR精度検証</td><td>本田</td><td>PoC<small>※</small>（概念実証）</td></tr>
+      <tr><td class="bold">第3週</td><td>森さんにデモ → フィードバック収集</td><td>本田・森さん</td><td>使えるかの判断</td></tr>
+      <tr><td class="bold">第4週</td><td>本番運用開始（並行運用）</td><td>全員</td><td>手動＋自動の併用</td></tr>
+      <tr><td class="bold">2ヶ月目</td><td>完全切り替え → 給与計算自動化</td><td>本田・森さん</td><td>効果測定開始</td></tr>
+      <tr><td class="bold">3ヶ月目</td><td>Phase 1完了報告 → 樫迫さんヒアリング開始</td><td>本田 → 社長</td><td>数値で成果報告</td></tr>
+    </tbody>
+  </table>
+
+  <h3>マイルストーン</h3>
+  <table>
+    <thead><tr><th>時期</th><th>マイルストーン</th><th>成功指標</th></tr></thead>
+    <tbody>
+      <tr><td class="bold">1ヶ月後</td><td>報告書OCR稼働開始</td><td>転記作業の大幅削減</td></tr>
+      <tr><td class="bold">3ヶ月後</td><td>Phase 1完了</td><td>月間31時間の削減を達成</td></tr>
+      <tr><td class="bold">6ヶ月後</td><td>Phase 2完了（シフト自動化含む）</td><td>月間65時間の削減を達成</td></tr>
+      <tr><td class="bold">12ヶ月後</td><td>全Phase完了</td><td>月間72時間削減、ダッシュボード稼働</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-footer">ATS DX推進提案書 | 2026年3月 — 6</div>
+</div>
+
+<!-- ===== 7. APPENDIX ===== -->
+<div class="page">
+  <div class="section-num">APPENDIX</div>
+  <h2 class="section-title">付録: 技術詳細</h2>
+
+  <h3>報告書自動化システム構成図</h3>
+  <div class="flow-diagram">
+    <div class="flow-step" style="min-width:100px;">📱 現場隊員<br><small>LINE WORKSで<br>画像送信</small></div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="min-width:100px; background:var(--primary-light);">🤖 LINE WORKS<br>Bot（自動受信）</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="min-width:100px; background:var(--primary-light);">🔍 AI-OCR<br>上番・下番読取</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step" style="min-width:100px; background:var(--primary-light);">🧠 AI<br>データ整理・補正</div>
+    <div class="flow-arrow">→</div>
+    <div class="flow-step solution" style="min-width:100px;">📊 Excel自動出力<br>→ 給与計算自動化</div>
+  </div>
+
+  <h3>使用技術スタック</h3>
+  <table>
+    <thead><tr><th>カテゴリ</th><th>技術/ツール</th><th>用途</th><th class="text-right">月額コスト</th></tr></thead>
+    <tbody>
+      <tr><td>AI-OCR</td><td>Google Cloud Vision API</td><td>報告書画像の文字読み取り</td><td class="text-right">¥0〜500</td></tr>
+      <tr><td>AI補助</td><td>Claude API（Anthropic）</td><td>文脈理解・データ補正</td><td class="text-right">¥1,000〜3,000</td></tr>
+      <tr><td>Bot基盤</td><td>LINE WORKS Bot API 2.0</td><td>メッセージ受信・通知送信</td><td class="text-right">¥0</td></tr>
+      <tr><td>サーバー</td><td>Google Cloud Run</td><td>システム実行環境</td><td class="text-right">¥1,000〜3,000</td></tr>
+      <tr><td>データベース</td><td>Google Sheets / Supabase</td><td>隊員DB・案件DB</td><td class="text-right">¥0</td></tr>
+      <tr><td>開発言語</td><td>Python 3.11 + FastAPI</td><td>Bot・自動化スクリプト</td><td class="text-right">¥0</td></tr>
+    </tbody>
+  </table>
+
+  <h3>セキュリティ対策</h3>
+  <table>
+    <thead><tr><th>項目</th><th>対策</th></tr></thead>
+    <tbody>
+      <tr><td>通信暗号化</td><td>全通信HTTPS<small>※</small>化、LINE WORKS Webhook<small>※</small>署名検証</td></tr>
+      <tr><td>認証情報管理</td><td>環境変数で管理、ソースコードに含めない</td></tr>
+      <tr><td>データ保存</td><td>OCR後の画像は一定期間で自動削除、アクセス権限最小化</td></tr>
+      <tr><td>個人情報</td><td>データ処理ポリシーに準拠、リージョンは東京（国内サーバー）を指定</td></tr>
+    </tbody>
+  </table>
+
+  <h3>警備業法への準拠</h3>
+  <p>本提案はすべて社内の業務効率化に関するものであり、警備業法（第45条: 警備員名簿、教育実施簿等）に定められた書類の管理義務には影響を与えません。むしろデジタル管理により、法定書類の期限管理・検索性が向上し、<strong>コンプライアンス強化</strong>につながります。</p>
+
+  <div class="page-footer">ATS DX推進提案書 | 2026年3月 — 7</div>
+</div>
+
+<!-- ===== 8. GLOSSARY ===== -->
+<div class="page">
+  <div class="section-num">SECTION 08</div>
+  <h2 class="section-title">用語集</h2>
+
+  <p style="font-size:10pt; margin-bottom:16px;">本書で使用している専門用語の説明です。本文中の<small>※</small>マークが付いた用語はこちらで解説しています。</p>
+
+  <table class="glossary-table">
+    <thead><tr><th>用語</th><th>正式名称</th><th>意味</th></tr></thead>
+    <tbody>
+      <tr><td><strong>DX</strong></td><td>Digital Transformation<br>（デジタルトランスフォーメーション）</td><td>ITやAIを活用して業務のやり方を改善・効率化すること</td></tr>
+      <tr><td><strong>ROI</strong></td><td>Return On Investment<br>（リターン・オン・インベストメント）</td><td>投資対効果。かけたお金に対してどれだけ効果が得られるかの指標</td></tr>
+      <tr><td><strong>AI</strong></td><td>Artificial Intelligence<br>（人工知能）</td><td>コンピューターが人間のように文章を読んだり判断したりする技術</td></tr>
+      <tr><td><strong>OCR</strong></td><td>Optical Character Recognition<br>（光学文字認識）</td><td>写真や画像に書かれた文字をコンピューターが読み取る技術</td></tr>
+      <tr><td><strong>AI-OCR</strong></td><td>—</td><td>AIを活用した高精度のOCR。手書き文字も読み取れる</td></tr>
+      <tr><td><strong>API</strong></td><td>Application Programming Interface</td><td>ソフトウェア同士をつなぐ窓口。外部サービスを利用するための仕組み</td></tr>
+      <tr><td><strong>Bot</strong></td><td>ボット</td><td>自動で動くプログラム。メッセージの送受信などを自動化する</td></tr>
+      <tr><td><strong>PoC</strong></td><td>Proof of Concept<br>（概念実証）</td><td>本格導入前の小規模テスト。効果を確かめてから進める方法</td></tr>
+      <tr><td><strong>CRM</strong></td><td>Customer Relationship Management<br>（顧客関係管理）</td><td>お客様の情報や対応履歴を一元管理する仕組み</td></tr>
+      <tr><td><strong>DB</strong></td><td>Database<br>（データベース）</td><td>情報を整理して保管する仕組み。Excelの高機能版のようなもの</td></tr>
+      <tr><td><strong>HTTPS</strong></td><td>—</td><td>インターネット通信を暗号化して安全にする仕組み</td></tr>
+      <tr><td><strong>Webhook</strong></td><td>—</td><td>あるシステムで出来事が起きたとき、自動で別のシステムに通知する仕組み</td></tr>
+      <tr><td><strong>クラウド</strong></td><td>Cloud</td><td>インターネット上のサーバーでデータを管理・処理すること。自社にサーバーを置かなくてよい</td></tr>
+      <tr><td><strong>Phase</strong></td><td>フェーズ</td><td>段階。本提案では3段階に分けて進める計画</td></tr>
+    </tbody>
+  </table>
+
+  <div class="page-footer">ATS DX推進提案書 | 2026年3月 — 8<br>提案者: 本田 英樹 | Confidential — 社外秘</div>
+</div>
+
+</body>
+</html>
